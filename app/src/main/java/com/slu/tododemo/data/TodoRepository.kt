@@ -3,9 +3,9 @@ package com.slu.tododemo.data
 import android.app.Application
 import androidx.room.Room
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 
-class TodoRepository(private val appContext: Application) {
+// Room-based implementation of the repository contract.
+class TodoRepository(private val appContext: Application) : TodoRepositoryContract {
 
     private val database by lazy {
         Room.databaseBuilder(
@@ -15,19 +15,21 @@ class TodoRepository(private val appContext: Application) {
         ).build()
     }
 
-
-    suspend fun getAllTodos(): Flow<TodoEntity> {
-        return database.getDao().getAllTodos().asFlow()
-
+    // Active approach: observe the table and emit updates automatically.
+    override fun observeTodos(): Flow<List<TodoEntity>> {
+        return database.getDao().observeTodos()
     }
 
-    suspend fun getTodoById(id: String): TodoEntity? {
+    // Single-shot alternative (kept as reference).
+    // suspend fun getAllTodos(): List<TodoEntity> {
+    //     return database.getDao().getAllTodos()
+    // }
+
+    override suspend fun getTodoById(id: String): TodoEntity? {
         return database.getDao().getTodoById(id)
     }
 
-
-    suspend fun insertTodo(todo: TodoEntity) {
-        return database.getDao().insertTodo(todo)
+    override suspend fun insertTodo(todo: TodoEntity) {
+        database.getDao().insertTodo(todo)
     }
-
 }

@@ -1,7 +1,6 @@
 package com.slu.tododemo.presentation
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -13,34 +12,49 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.slu.tododemo.Priority
+import com.slu.tododemo.data.TodoEntity
+import java.util.UUID
 
 @Composable
-fun CreateTodo() {
+fun CreateTodo(
+    mainViewModel: MainViewModel,
+    onSaveSuccess: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var titleState by remember { mutableStateOf("") }
+    var descState by remember { mutableStateOf("") }
 
-    var titleState: String by remember { mutableStateOf("") }
-    var descState: String by remember { mutableStateOf("") }
-    Column {
+    Column(modifier = modifier) {
         TextField(
             value = titleState,
-            onValueChange = { /* Handle title change */
-                titleState = it
-            },
-            label = { androidx.compose.material3.Text("Title") }
-
+            onValueChange = { titleState = it },
+            label = { Text("Title") }
         )
         TextField(
             value = descState,
-            onValueChange = { /* Handle description change */
-                descState = it
-            },
-            label = { androidx.compose.material3.Text("Description") }
+            onValueChange = { descState = it },
+            label = { Text("Description") }
         )
         Button(
             onClick = {
-                //handle action
+                val title = titleState.trim()
+                if (title.isEmpty()) return@Button
+
+                val todo = TodoEntity(
+                    id = UUID.randomUUID().toString(),
+                    title = title,
+                    description = descState.trim(),
+                    createdOn = System.currentTimeMillis(),
+                    priority = Priority.MEDIUM
+                )
+
+                // Persist and then return to landing.
+                mainViewModel.insertTodo(todo) {
+                    onSaveSuccess()
+                }
             },
             modifier = Modifier.padding(8.dp),
-
         ) {
             Text("Save")
         }
