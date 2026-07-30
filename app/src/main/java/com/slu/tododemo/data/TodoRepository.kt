@@ -2,6 +2,8 @@ package com.slu.tododemo.data
 
 import android.app.Application
 import androidx.room.Room
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 
 class TodoRepository(private val appContext: Application) {
 
@@ -14,8 +16,8 @@ class TodoRepository(private val appContext: Application) {
     }
 
 
-    suspend fun getAllTodos(): List<TodoEntity> {
-        return database.getDao().getAllTodos()
+    suspend fun getAllTodos(): Flow<TodoEntity> {
+        return database.getDao().getAllTodos().asFlow()
 
     }
 

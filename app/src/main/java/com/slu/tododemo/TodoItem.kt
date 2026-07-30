@@ -1,5 +1,7 @@
 package com.slu.tododemo
 
+import com.slu.tododemo.data.TodoEntity
+
 data class TodoItem(
     val id: String,
     val title: String,
@@ -14,3 +16,21 @@ enum class Priority {
     MEDIUM,
     LOW
 }
+
+ fun TodoEntity.toUi() = TodoItem(
+    id = id,
+    title = title,
+    description = description,
+    createdOn = createdOn,
+    priority = priority
+)
+
+ fun TodoItem.toEntity() = TodoEntity(
+    id = id,
+    title = title,
+    description = description,
+    createdOn = createdOn,
+    priority = priority
+)
+
+

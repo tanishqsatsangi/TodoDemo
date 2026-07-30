@@ -6,10 +6,21 @@ import androidx.lifecycle.viewModelScope
 import com.slu.tododemo.TodoItem
 import com.slu.tododemo.data.TodoEntity
 import com.slu.tododemo.data.TodoRepository
+import com.slu.tododemo.toUi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(val appContext: Application) :
     AndroidViewModel(appContext) {
+
+    private val _todos = MutableStateFlow<List<TodoItem>>(emptyList())
+    val todos: StateFlow<List<TodoItem>> = _todos.asStateFlow()
+
+    private val _todoById = MutableStateFlow<List<TodoItem>>(emptyList())
+    val todoById: StateFlow<List<TodoItem>> = _todos.asStateFlow()
+
 
     private val todoRepository by lazy {
         TodoRepository(appContext)
@@ -17,7 +28,10 @@ class MainViewModel(val appContext: Application) :
 
     fun getAllTodos() {
         viewModelScope.launch {
-            mapDatatoUiModel(todoRepository.getAllTodos())
+            todoRepository.getAllTodos().collect { list ->
+                _todos.value = list.toUi()
+            }
+
         }
     }
 
